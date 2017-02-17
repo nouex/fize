@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint -c ./node_modules/eslint-config-gonodio/gonodio.json index.js bin.js"
+    "lint": "eslint -c .eslintrc.json index.js bin.js"
   },
   "author": "",
   "license": "MIT",
