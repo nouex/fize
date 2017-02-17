@@ -11,6 +11,8 @@
   *   format-size:2after dot
   */
 
+module.exports = traverseDir;
+
 let fs = require("fs");
 let path = require("path");
 let assert = require("assert");
@@ -18,9 +20,7 @@ let assert = require("assert");
 const TYPE_FILE = Symbol();
 const TYPE_DIR = Symbol();
 
-let targetpath = process.argv[2];
-
-function traverseDir(dirPath, foundFile, info) {
+function traverseDir(dirPath, info) {
   if (info === undefined) {
     // if verbose console.log("createing info obj")
     info = {
@@ -39,7 +39,7 @@ function traverseDir(dirPath, foundFile, info) {
     let fileType = exists(filePath);
     switch(fileType) {
       case TYPE_DIR:
-        traverseDir(filePath, foundFile, info);
+        traverseDir(filePath, info);
         break;
       case TYPE_FILE:
         foundFile(filePath, info);
@@ -97,39 +97,3 @@ function exists (path) {
   // something we don't care about
   else return null;
 }
-
-function put(info) {
-  let totalSize = 0;
-  let exts = Object.keys(info.exts)
-
-  console.log("\n\n");
-  for (const key of exts) {
-    const ext = info.exts[key];
-    const size = ext.size;
-    totalSize += size;
-    console.log(`${key} ${ext.fileCount} ${byteToHuman(size)}`)
-  }
-
-  totalSize = byteToHuman(totalSize);
-  console.log("-------------");
-  console.log(`found ${info.fileCount} ${totalSize}`);
-}
-
-function byteToHuman(bytes) {
-  bytes = +bytes;
-
-  let units = ["b", "kb", "mb", "gb", "tb", "?", "??", "???", "????"];
-  let count, dotInd;
-
-  for (count = 0; bytes > 1024; bytes = bytes / 1024, count++) ;
-
-  bytes = String(bytes);
-  dotInd = bytes.indexOf(".");
-
-  if (~~dotInd) bytes = bytes.slice(0, dotInd +3);
-
-  return "" + bytes + units[count];
-}
-// usage
-
-put(traverseDir(targetpath, foundFile));
