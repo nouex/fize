@@ -5,6 +5,8 @@ const info = require( "./index" );
 
 let targetpath = process.argv[ 2 ];
 
+put( info( targetpath ) );
+
 function put( info ) {
 	let totalSize = 0;
 	let exts = Object.keys( info.exts )
@@ -20,6 +22,8 @@ function put( info ) {
 	totalSize = byteToHuman( totalSize );
 	console.log( "-------------" );
 	console.log( `found ${info.fileCount} ${totalSize}` );
+
+	return void ( 0 );
 }
 
 function byteToHuman( bytes ) {
@@ -38,6 +42,3 @@ function byteToHuman( bytes ) {
 
 	return "" + bytes + units[ count ];
 }
-// usage
-
-put( info( targetpath ) );

@@ -22,7 +22,6 @@ const TYPE_DIR = Symbol();
 
 function traverseDir( dirPath, info ) {
 	if ( info === undefined ) {
-    // if verbose console.log("createing info obj")
 		info = {
 			fileCount: 0,
 			exts: {}
@@ -61,6 +60,7 @@ function traverseDir( dirPath, info ) {
 function checkExtension( ext, byteCount, info ) {
 	ext = ext || "<no-ext>";
 	byteCount = +byteCount;
+
 	let extArr;
 
 	if ( info.exts[ ext ] === undefined ) {
@@ -78,14 +78,14 @@ function checkExtension( ext, byteCount, info ) {
 }
 
 function foundFile( filePath, info ) {
-  //console.log("file found: " + filePath);
 	let buffer,
 		fileParsed;
+
 	info.fileCount += 1;
 	fileParsed = path.parse( filePath );
 	buffer = fs.readFileSync( filePath );
-  //console.log(fileParsed.ext, buffer.length);
 	checkExtension( fileParsed.ext, buffer.length, info );
+	return void ( 0 );
 }
 
 function exists( path ) {
