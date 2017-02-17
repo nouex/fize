@@ -2,6 +2,7 @@
 
 // TODO: outpu with colors
 const info = require( "./index" );
+const colors = require("colors");
 
 let targetpath = process.argv[ 2 ];
 
@@ -11,17 +12,17 @@ function put( info ) {
 	let totalSize = 0;
 	let exts = Object.keys( info.exts )
 
-	console.log( "\n\n" );
+	log( colors.black.bold("---------------") );
 	for ( const key of exts ) {
 		const ext = info.exts[ key ];
 		const size = ext.size;
 		totalSize += size;
-		console.log( `${key} ${ext.fileCount} ${byteToHuman( size )}` )
+		log( `${colors.magenta(key)} ${colors.blue(ext.fileCount)} ${colors.blue(byteToHuman( size ))}` );
 	}
 
 	totalSize = byteToHuman( totalSize );
-	console.log( "-------------" );
-	console.log( `found ${info.fileCount} ${totalSize}` );
+	log( colors.black.bold("---------------") );
+	log( colors.green(`found ${info.fileCount} files, ${totalSize}`) );
 
 	return void ( 0 );
 }
@@ -41,4 +42,8 @@ function byteToHuman( bytes ) {
 	if ( ~~dotInd ) bytes = bytes.slice( 0, dotInd + 3 );
 
 	return "" + bytes + units[ count ];
+}
+
+function log( _ ) {
+	process.stdout.write( _+"\r\n", "utf8" );
 }
