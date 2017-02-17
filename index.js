@@ -13,44 +13,44 @@
 
 module.exports = traverseDir;
 
-let fs = require("fs");
-let path = require("path");
-let assert = require("assert");
+const fs = require( "fs" );
+const path = require( "path" );
+const assert = require( "assert" );
 
 const TYPE_FILE = Symbol();
 const TYPE_DIR = Symbol();
 
-function traverseDir(dirPath, info) {
-  if (info === undefined) {
+function traverseDir( dirPath, info ) {
+	if ( info === undefined ) {
     // if verbose console.log("createing info obj")
-    info = {
-      fileCount: 0,
-      exts: {}
-    };
-  }
+		info = {
+			fileCount: 0,
+			exts: {}
+		};
+	}
 
-  let dir;
+	let dir;
 
-  dir = path.resolve(dirPath);
-  assert.strictEqual(exists(dir), TYPE_DIR);
-  dir = fs.readdirSync(dir);
-  dir.forEach((filePath) => {
-    filePath = path.resolve(dirPath, filePath);
-    let fileType = exists(filePath);
-    switch(fileType) {
-      case TYPE_DIR:
-        traverseDir(filePath, info);
-        break;
-      case TYPE_FILE:
-        foundFile(filePath, info);
-        break;
-      default:
+	dir = path.resolve( dirPath );
+	assert.strictEqual( exists( dir ), TYPE_DIR );
+	dir = fs.readdirSync( dir );
+	dir.forEach( ( filePath ) => {
+		filePath = path.resolve( dirPath, filePath );
+		let fileType = exists( filePath );
+		switch ( fileType ) {
+		case TYPE_DIR:
+			traverseDir( filePath, info );
+			break;
+		case TYPE_FILE:
+			foundFile( filePath, info );
+			break;
+		default:
         // skip
-        break;
-    }
-  }, void(0));
+			break;
+		}
+	}, void ( 0 ) );
 
-  return info;
+	return info;
 }
 
 /**
@@ -58,42 +58,43 @@ function traverseDir(dirPath, info) {
   *   1. update fileCount
   *   2. update size
   */
-function checkExtension(ext, byteCount, info) {
-  ext = ext || "<no-ext>";
-  byteCount = +byteCount;
-  let extArr;
+function checkExtension( ext, byteCount, info ) {
+	ext = ext || "<no-ext>";
+	byteCount = +byteCount;
+	let extArr;
 
-  if (info.exts[ext] === undefined) {
-    info.exts[ext] = {
-      size: 0,
-      fileCount: 0
-    };
-  }
+	if ( info.exts[ ext ] === undefined ) {
+		info.exts[ ext ] = {
+			size: 0,
+			fileCount: 0
+		};
+	}
 
-  extArr = info.exts[ext];
-  extArr.size += byteCount;
-  extArr.fileCount += 1;
+	extArr = info.exts[ ext ];
+	extArr.size += byteCount;
+	extArr.fileCount += 1;
 
-  return void(0);
+	return void ( 0 );
 }
 
-function foundFile (filePath, info) {
+function foundFile( filePath, info ) {
   //console.log("file found: " + filePath);
-  let buffer, fileParsed;
-  info.fileCount += 1;
-  fileParsed = path.parse(filePath);
-  buffer = fs.readFileSync(filePath);
+	let buffer,
+		fileParsed;
+	info.fileCount += 1;
+	fileParsed = path.parse( filePath );
+	buffer = fs.readFileSync( filePath );
   //console.log(fileParsed.ext, buffer.length);
-  checkExtension(fileParsed.ext, buffer.length, info);
+	checkExtension( fileParsed.ext, buffer.length, info );
 }
 
-function exists (path) {
-  let stat;
+function exists( path ) {
+	let stat;
 
-  stat = fs.statSync(path);
-  if (stat == null) return null;
-  else if (stat.isFile()) return TYPE_FILE;
-  else if (stat.isDirectory()) return TYPE_DIR;
+	stat = fs.statSync( path );
+	if ( stat == null ) return null;
+	else if ( stat.isFile() ) return TYPE_FILE;
+	else if ( stat.isDirectory() ) return TYPE_DIR;
   // something we don't care about
-  else return null;
+	else return null;
 }

@@ -4,8 +4,13 @@
   "description": "measure size, count files in dir",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint -c ./node_modules/eslint-config-gonodio/gonodio.json index.js bin.js"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint-config-gonodio": "^0.3.0",
+    "eslint": "v3.14.0"
+  }
 }
