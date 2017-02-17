@@ -20,8 +20,15 @@ const TYPE_DIR = Symbol();
 
 let targetpath = process.argv[2];
 
-// TODO: return info object so we don't pollute global space
-function traverseDir(dirPath, foundFile) {
+function traverseDir(dirPath, foundFile, info) {
+  if (info === undefined) {
+    // if verbose console.log("createing info obj")
+    info = {
+      fileCount: 0,
+      exts: {}
+    };
+  }
+
   let dir;
 
   dir = path.resolve(dirPath);
@@ -32,35 +39,80 @@ function traverseDir(dirPath, foundFile) {
     let fileType = exists(filePath);
     switch(fileType) {
       case TYPE_DIR:
-        traverseDir(filePath, foundFile);
+        traverseDir(filePath, foundFile, info);
         break;
       case TYPE_FILE:
-        foundFile(filePath);
+        foundFile(filePath, info);
         break;
       default:
         // skip
         break;
     }
   }, void(0));
+
+  return info;
 }
 
-// stats we want
-let nFiles = 0;
-let extensions = [];
+/**
+  * If new ext, register it.
+  *   1. update fileCount
+  *   2. update size
+  */
+function checkExtension(ext, byteCount, info) {
+  ext = ext || "<no-ext>";
+  byteCount = +byteCount;
+  let extArr;
 
-function put() {
-  let size, totalSize = 0;
+  if (info.exts[ext] === undefined) {
+    info.exts[ext] = {
+      size: 0,
+      fileCount: 0
+    };
+  }
+
+  extArr = info.exts[ext];
+  extArr.size += byteCount;
+  extArr.fileCount += 1;
+
+  return void(0);
+}
+
+function foundFile (filePath, info) {
+  //console.log("file found: " + filePath);
+  let buffer, fileParsed;
+  info.fileCount += 1;
+  fileParsed = path.parse(filePath);
+  buffer = fs.readFileSync(filePath);
+  //console.log(fileParsed.ext, buffer.length);
+  checkExtension(fileParsed.ext, buffer.length, info);
+}
+
+function exists (path) {
+  let stat;
+
+  stat = fs.statSync(path);
+  if (stat == null) return null;
+  else if (stat.isFile()) return TYPE_FILE;
+  else if (stat.isDirectory()) return TYPE_DIR;
+  // something we don't care about
+  else return null;
+}
+
+function put(info) {
+  let totalSize = 0;
+  let exts = Object.keys(info.exts)
 
   console.log("\n\n");
-  extensions.forEach((extArr) => {
-    totalSize += extArr[2];
-    size = byteToHuman(extArr[2])
-    console.log(`${extArr[0]} ${extArr[1]} ${size}`)
-  });
+  for (const key of exts) {
+    const ext = info.exts[key];
+    const size = ext.size;
+    totalSize += size;
+    console.log(`${key} ${ext.fileCount} ${byteToHuman(size)}`)
+  }
 
   totalSize = byteToHuman(totalSize);
   console.log("-------------");
-  console.log(`found ${nFiles} ${totalSize}`);
+  console.log(`found ${info.fileCount} ${totalSize}`);
 }
 
 function byteToHuman(bytes) {
@@ -78,46 +130,6 @@ function byteToHuman(bytes) {
 
   return "" + bytes + units[count];
 }
-
-function checkExtension (ext, byteCount) {
-  if (ext.length === 0) ext = "<no-ext>";
-  byteCount = +byteCount;
-  let found = false;
-  for (let extArr of extensions) {
-    if (extArr[0] === ext) {
-      extArr[1] += 1;
-      extArr[2] += byteCount;
-      found = true;
-      break;
-    }
-  }
-
-  if (found === false) extensions.push([ext, 1, +byteCount]);
-}
-
-function foundFile (filePath) {
-  //console.log("file found: " + filePath);
-  let buffer, fileParsed;
-  nFiles +=  1;
-  fileParsed = path.parse(filePath);
-  buffer = fs.readFileSync(filePath);
-  //console.log(fileParsed.ext, buffer.length);
-  checkExtension(fileParsed.ext, buffer.length);
-}
-
-function exists (path) {
-  let stat;
-
-  stat = fs.statSync(path);
-  if (stat == null) return null;
-  else if (stat.isFile()) return TYPE_FILE;
-  else if (stat.isDirectory()) return TYPE_DIR;
-  // something we don't care about
-  else return null;
-}
-
 // usage
-/*
-traverseDir(targetpath, foundFile);
-put();
-*/
+
+put(traverseDir(targetpath, foundFile));
