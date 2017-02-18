@@ -17,5 +17,5 @@
     "colors": "^1.1.2",
     "nconf": "^0.8.4"
   },
-  "bin": "./bins.js"
+  "bin": "./bin.js"
 }
