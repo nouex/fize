@@ -1,6 +1,6 @@
 {
   "name": "fize",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "measure size, count files in dir",
   "main": "index.js",
   "scripts": {
