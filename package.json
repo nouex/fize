@@ -14,6 +14,8 @@
     "eslint": "v3.14.0"
   },
   "dependencies": {
-    "colors": "^1.1.2"
-  }
+    "colors": "^1.1.2",
+    "nconf": "^0.8.4"
+  },
+  "bin": "./bins.js"
 }

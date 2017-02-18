@@ -1,27 +1,19 @@
 "use strict";
-/**
-  * Stats for
-  *   1. n of files by lang
-  *   2. n of bytes by lang
-  * TODO: add verbose ooption for loggins
-  * TODO: use nconf to get config of opts:
-  *   verbose
-  *   exlude-paths=NIL
-  *   depth=INFINITY
-  *   format-size:2after dot
-  */
 
 module.exports = traverseDir;
 
 const fs = require( "fs" );
 const path = require( "path" );
 const assert = require( "assert" );
+const colors = require("colors");
+const log = require("./helpers").log;
 
 const TYPE_FILE = Symbol();
 const TYPE_DIR = Symbol();
 
-function traverseDir( dirPath, info ) {
-	if ( info === undefined ) {
+function traverseDir( dirPath, info, depth, excludePaths, verbose ) {
+	if (depth <= -1) return;
+	if ( info == undefined ) {
 		info = {
 			fileCount: 0,
 			exts: {}
@@ -35,13 +27,14 @@ function traverseDir( dirPath, info ) {
 	dir = fs.readdirSync( dir );
 	dir.forEach( ( filePath ) => {
 		filePath = path.resolve( dirPath, filePath );
+		if (~excludePaths.indexOf(filePath)) return;
 		let fileType = exists( filePath );
 		switch ( fileType ) {
 		case TYPE_DIR:
-			traverseDir( filePath, info );
+			traverseDir( filePath, info, --depth, excludePaths, verbose);
 			break;
 		case TYPE_FILE:
-			foundFile( filePath, info );
+			foundFile( filePath, info, verbose );
 			break;
 		default:
         // skip
@@ -77,7 +70,7 @@ function checkExtension( ext, byteCount, info ) {
 	return void ( 0 );
 }
 
-function foundFile( filePath, info ) {
+function foundFile( filePath, info, verbose ) {
 	let buffer,
 		fileParsed;
 
@@ -85,6 +78,7 @@ function foundFile( filePath, info ) {
 	fileParsed = path.parse( filePath );
 	buffer = fs.readFileSync( filePath );
 	checkExtension( fileParsed.ext, buffer.length, info );
+	verbose ? log(colors.blue("file: ") + filePath) : void(0);
 	return void ( 0 );
 }
 
