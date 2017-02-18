@@ -17,5 +17,7 @@
     "colors": "^1.1.2",
     "nconf": "^0.8.4"
   },
-  "bin": "./bin.js"
+  "bin": {
+    "fize": "./bin.js"
+  }
 }
