@@ -91,6 +91,7 @@ function put( info ) {
 }
 
 function byteToHuman( bytes, afterDot ) {
+	afterDot = Number(afterDot);
 	bytes = +bytes;
 
 	let units = [ "b", "kb", "mb", "gb", "tb", "?", "??", "???", "????" ];
@@ -102,7 +103,12 @@ function byteToHuman( bytes, afterDot ) {
 	bytes = String( bytes );
 	dotInd = bytes.indexOf( "." );
 
-	if ( ~~dotInd ) bytes = bytes.slice( 0, dotInd + afterDot +1 );
-
+	if ( ~dotInd ) {
+		if (afterDot === 0) {
+			bytes = bytes.slice(0, dotInd);
+		} else {
+			bytes = bytes.slice( 0, dotInd + afterDot +1 );
+		}
+	}
 	return "" + bytes + units[ count ];
 }
