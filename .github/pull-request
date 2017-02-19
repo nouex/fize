@@ -1,0 +1,1 @@
+**REMEMBER NOT TO RUN `eslint --fix bin.js` cause the shebang will have CRLF and it won't work**
