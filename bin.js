@@ -31,11 +31,7 @@ nconf.argv({
 	depth: Infinity,
 	afterDot: 2
 });
-/*
-console.log(nconf.get("verbose"), nconf.get("excludePaths"), nconf.get("depth"), nconf.get("afterDot"))
 
-process.exit(0)
-*/
 let targetpath = process.argv[ process.argv.length -1 ];
 
 put(
@@ -44,14 +40,48 @@ put(
 
 function put( info ) {
 	let totalSize = 0;
-	let exts = Object.keys( info.exts )
+	let exts = Object.keys( info.exts );
+	let out = [];
+	let colSize = [-Infinity, -Infinity, -Infinity];
+	let wSpace = " ";
+	let colColors = [];
+	let outInd = 0;
+
+	colColors[0] = colors.blue.bind(colors);
+	colColors[1] = colors.magenta.bind(colors);
+	colColors[2] = colors.magenta.bind(colors);
 
 	log( colors.black.bold("---------------") );
 	for ( const key of exts ) {
 		const ext = info.exts[ key ];
 		const size = ext.size;
+		const o = out[outInd++] = [];
+		const byteHuman = byteToHuman(size, nconf.get("afterDot"))
+
+		// override max size if found
+		colSize[0] = Math.max(colSize[0], ("" + key).length);
+		o.push(key + "");
+		colSize[1] = Math.max(colSize[1], ("" + ext.fileCount).length);
+		o.push(ext.fileCount);
+		colSize[2] = Math.max(colSize[2], byteHuman.length);
+		o.push(byteHuman);
 		totalSize += size;
-		log( `${colors.blue(key)} ${colors.magenta(ext.fileCount)} ${colors.magenta(byteToHuman( size, nconf.get("afterDot")))}` );
+		// log( `${colors.blue(key)} ${colors.magenta(ext.fileCount)} ${colors.magenta(byteToHuman( size, nconf.get("afterDot")))}` );
+	}
+
+	for (const o of out) {
+		let line = [],
+				whole = "";
+		for (const ind in o) {
+			if (!o.hasOwnProperty(ind)) continue;
+			let oo = String(o[ind]);
+			let clearance = colSize[ind] - oo.length;
+			line[ind] = String(oo);
+			while (clearance--) line[ind] +=  wSpace;
+			line[ind] = colColors[ind](line[ind]);
+		}
+		whole = line.join(wSpace);
+		log(whole);
 	}
 
 	totalSize = byteToHuman( totalSize, nconf.get("afterDot"));
