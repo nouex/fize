@@ -66,7 +66,6 @@ function put( info ) {
 		colSize[2] = Math.max(colSize[2], byteHuman.length);
 		o.push(byteHuman);
 		totalSize += size;
-		// log( `${colors.blue(key)} ${colors.magenta(ext.fileCount)} ${colors.magenta(byteToHuman( size, nconf.get("afterDot")))}` );
 	}
 
 	for (const o of out) {
