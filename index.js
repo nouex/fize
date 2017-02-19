@@ -5,14 +5,14 @@ module.exports = traverseDir;
 const fs = require( "fs" );
 const path = require( "path" );
 const assert = require( "assert" );
-const colors = require("colors");
-const log = require("./helpers").log;
+const colors = require( "colors" );
+const log = require( "./helpers" ).log;
 
 const TYPE_FILE = Symbol();
 const TYPE_DIR = Symbol();
 
 function traverseDir( dirPath, info, depth, excludePaths, verbose ) {
-	if (depth <= -1) return;
+	if ( depth <= -1 ) return;
 	if ( info == undefined ) {
 		info = {
 			fileCount: 0,
@@ -27,11 +27,11 @@ function traverseDir( dirPath, info, depth, excludePaths, verbose ) {
 	dir = fs.readdirSync( dir );
 	dir.forEach( ( filePath ) => {
 		filePath = path.resolve( dirPath, filePath );
-		if (~excludePaths.indexOf(filePath)) return;
+		if ( ~excludePaths.indexOf( filePath ) ) return;
 		let fileType = exists( filePath );
 		switch ( fileType ) {
 		case TYPE_DIR:
-			traverseDir( filePath, info, --depth, excludePaths, verbose);
+			traverseDir( filePath, info, --depth, excludePaths, verbose );
 			break;
 		case TYPE_FILE:
 			foundFile( filePath, info, verbose );
@@ -78,7 +78,7 @@ function foundFile( filePath, info, verbose ) {
 	fileParsed = path.parse( filePath );
 	buffer = fs.readFileSync( filePath );
 	checkExtension( fileParsed.ext, buffer.length, info );
-	verbose ? log(colors.blue("file: ") + filePath) : void(0);
+	verbose ? log( colors.blue( "file: " ) + filePath ) : void ( 0 );
 	return void ( 0 );
 }
 
