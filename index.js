@@ -11,7 +11,7 @@ const log = require( "./helpers" ).log;
 const TYPE_FILE = Symbol();
 const TYPE_DIR = Symbol();
 
-function traverseDir( dirPath, info, depth, excludePaths, verbose ) {
+function traverseDir( objectPath, info, depth, excludePaths, verbose ) {
 	if ( depth <= -1 ) return;
 	if ( info == undefined ) {
 		info = {
@@ -20,27 +20,31 @@ function traverseDir( dirPath, info, depth, excludePaths, verbose ) {
 		};
 	}
 
-	let dir;
+	let object, type
 
-	dir = path.resolve( dirPath );
-	assert.strictEqual( exists( dir ), TYPE_DIR );
-	dir = fs.readdirSync( dir );
-	dir.forEach( ( filePath ) => {
-		filePath = path.resolve( dirPath, filePath );
-		if ( ~excludePaths.indexOf( filePath ) ) return;
-		let fileType = exists( filePath );
-		switch ( fileType ) {
-		case TYPE_DIR:
-			traverseDir( filePath, info, --depth, excludePaths, verbose );
-			break;
-		case TYPE_FILE:
-			foundFile( filePath, info, verbose );
-			break;
-		default:
-        // skip
-			break;
-		}
-	}, void ( 0 ) );
+	object = path.resolve( objectPath );
+	type = exists( object )
+	if (type === TYPE_DIR) {
+		object = fs.readdirSync( object );
+		object.forEach( ( filePath ) => {
+			filePath = path.resolve( objectPath, filePath );
+			if ( ~excludePaths.indexOf( filePath ) ) return;
+			let fileType = exists( filePath );
+			switch ( fileType ) {
+			case TYPE_DIR:
+				traverseDir( filePath, info, --depth, excludePaths, verbose );
+				break;
+			case TYPE_FILE:
+				foundFile( filePath, info, verbose );
+				break;
+			default:
+	        // skip
+				break;
+			}
+		}, void ( 0 ) );
+	} else if (type === TYPE_FILE) {
+		foundFile(object, info, verbose)
+	} else throw new Error("last arg must be an existing file or directory")
 
 	return info;
 }
