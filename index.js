@@ -28,6 +28,8 @@ function traverseDir( objectPath, info, depth, excludePaths, verbose ) {
 		object = fs.readdirSync( object );
 		object.forEach( ( filePath ) => {
 			filePath = path.resolve( objectPath, filePath );
+			// FIXME: the user doesn't pass fully resolved path names i don't think
+			//	so this woul'dnt work
 			if ( ~excludePaths.indexOf( filePath ) ) return;
 			let fileType = exists( filePath );
 			switch ( fileType ) {

@@ -32,7 +32,21 @@ nconf.argv( {
 	afterDot: 2
 } );
 
-let targetpath = process.argv[ process.argv.length - 1 ];
+let targetpath, _ = nconf.get("_")
+switch (_.length) {
+	case 0:
+		targetpath = process.cwd()
+		break;
+
+	case 1:
+		targetpath = _[0]
+		break;
+
+	default:
+		// TODO: add support for mult. files
+		throw new Error("a single target file must be provided")
+		break;
+}
 
 put(
 	info( targetpath, null, nconf.get( "depth" ),
